@@ -5,13 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace API.Controllers
 {
-    [Route("api/[controller")]
+    [Route("api/[controller]")]
     [ApiController]
-    class ActivitiesController : ControllerBase
+    public class ActivitiesController : ControllerBase
     {
         private readonly IMediator _mediator;
         public ActivitiesController(IMediator mediator)
@@ -19,10 +20,17 @@ namespace API.Controllers
             _mediator = mediator;
         }
 
+        //TODO cancellation token usage
         [HttpGet]
-        public async Task<ActionResult<List<Activity>>> List()
+        public async Task<ActionResult<List<Activity>>> List(CancellationToken ct)
         {
-            return await _mediator.Send(new List.Query());
+            return await _mediator.Send(new List.Query(), ct);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Activity>> Details(Guid id)
+        {
+            return await _mediator.Send(new Details.Query{Id = id});
         }
     }
 }
